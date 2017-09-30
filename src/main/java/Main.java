@@ -184,6 +184,46 @@ public class Main {
         glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
             if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
                 glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
+            else {
+                if ( key == GLFW_KEY_UP && action == GLFW_RELEASE ) {
+                    for(int i = 0; i < verticesList.size(); i++) {
+                        Vertex aux = new Vertex();
+                        aux.x = verticesList.get(i).x;
+                        aux.y = verticesList.get(i).y - 1.0;
+                        verticesList.set(i, aux);
+                    }
+                }
+                else {
+                    if ( key == GLFW_KEY_DOWN && action == GLFW_RELEASE ) {
+                        for(int i = 0; i < verticesList.size(); i++) {
+                            Vertex aux = new Vertex();
+                            aux.x = verticesList.get(i).x;
+                            aux.y = verticesList.get(i).y + 1.0;
+                            verticesList.set(i, aux);
+                        }
+                    }
+                    else {
+                        if ( key == GLFW_KEY_LEFT && action == GLFW_RELEASE ) {
+                            for(int i = 0; i < verticesList.size(); i++) {
+                                Vertex aux = new Vertex();
+                                aux.x = verticesList.get(i).x - 1.0;
+                                aux.y = verticesList.get(i).y;
+                                verticesList.set(i, aux);
+                            }
+                        }
+                        else {
+                            if ( key == GLFW_KEY_RIGHT && action == GLFW_RELEASE ) {
+                                for(int i = 0; i < verticesList.size(); i++) {
+                                    Vertex aux = new Vertex();
+                                    aux.x = verticesList.get(i).x + 1.0;
+                                    aux.y = verticesList.get(i).y;
+                                    verticesList.set(i, aux);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         });
 
         // Setup a mouse callback. It will be called every time the left mouse button is pressed.
@@ -303,6 +343,24 @@ public class Main {
         }
     }
 
+    private void draw(Main object) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+
+        if (object.verticesList.size() > 1) {
+            for (int i = 0; i < object.verticesList.size() - 1; i++) {
+                drawLine(object.verticesList.get(i), object.verticesList.get(i + 1));
+            }
+        }
+
+        this.scanLine(object.verticesList);
+
+        glfwSwapBuffers(window); // swap the color buffers
+
+        // Poll for window events. The key callback above will only be
+        // invoked during this call.
+        glfwPollEvents();
+    }
+
     private void loop() {
 
         // This line is critical for LWJGL's interoperation with GLFW's
@@ -320,21 +378,7 @@ public class Main {
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while ( !glfwWindowShouldClose(window) ) {
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-
-            if (verticesList.size() > 1) {
-                for (int i = 0; i < verticesList.size() - 1; i++) {
-                    drawLine(verticesList.get(i), verticesList.get(i + 1));
-                }
-            }
-
-            this.scanLine(verticesList);
-
-            glfwSwapBuffers(window); // swap the color buffers
-
-            // Poll for window events. The key callback above will only be
-            // invoked during this call.
-            glfwPollEvents();
+            draw(this);
         }
 
     }
