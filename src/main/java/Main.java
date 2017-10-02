@@ -4,15 +4,24 @@
         Vinicius Ito Nagura (558478)
  */
 
+import com.sun.javafx.geom.Matrix3f;
+import javafx.scene.transform.MatrixType;
+import org.apache.commons.math3.exception.MathIllegalArgumentException;
+import org.apache.commons.math3.linear.MatrixUtils;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.MathUtils;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.system.MathUtil;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -157,6 +166,109 @@ public class Main {
 
     }
 
+    public void translation(ArrayList<Vertex> list, int direction, double value) {
+
+        switch (direction) {
+            // Up
+            case 0:
+                for(int i = 0; i < list.size(); i++) {
+                    Vertex aux = new Vertex();
+                    aux.x = list.get(i).x;
+                    aux.y = list.get(i).y - value;
+                    list.set(i, aux);
+                }
+                break;
+
+            // Down
+            case 1:
+                for(int i = 0; i < list.size(); i++) {
+                    Vertex aux = new Vertex();
+                    aux.x = list.get(i).x;
+                    aux.y = list.get(i).y + value;
+                    list.set(i, aux);
+                }
+                break;
+
+            // Left
+            case 2:
+                for(int i = 0; i < list.size(); i++) {
+                    Vertex aux = new Vertex();
+                    aux.x = list.get(i).x - value;
+                    aux.y = list.get(i).y;
+                    list.set(i, aux);
+                }
+                break;
+
+            // Right
+            case 3:
+                for(int i = 0; i < list.size(); i++) {
+                    Vertex aux = new Vertex();
+                    aux.x = list.get(i).x + value;
+                    aux.y = list.get(i).y;
+                    list.set(i, aux);
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    public void scale(ArrayList<Vertex> originalList, int direction, double value) {
+
+        ArrayList<Vertex> auxList = new ArrayList<>();
+        auxList.addAll(originalList);
+
+        translation(auxList, 0, auxList.get(0).y);
+        translation(auxList, 2, auxList.get(0).x);
+
+        switch(direction) {
+
+            case 0:
+                for(int i = 0; i < auxList.size(); i++) {
+
+                    double[][] p = { {auxList.get(i).x}, {auxList.get(i).y} };
+                    double[][] s = { {value, 0}, {0, 1} };
+
+                    RealMatrix matrixP = MatrixUtils.createRealMatrix(p);
+                    RealMatrix matrixS = MatrixUtils.createRealMatrix(s);
+                    RealMatrix matrixPLine = matrixS.multiply(matrixP);
+
+                    Vertex aux = new Vertex();
+                    aux.x = matrixPLine.getEntry(0,0);
+                    aux.y = matrixPLine.getEntry(1,0);
+                    auxList.set(i, aux);
+                }
+                translation(auxList, 1, originalList.get(0).y);
+                translation(auxList, 3, originalList.get(0).x * value);
+                break;
+
+            case 1:
+                for(int i = 0; i < auxList.size(); i++) {
+                    double[][] p = { {auxList.get(i).x}, {auxList.get(i).y} };
+                    double[][] s = { {1, 0}, {0, value} };
+
+                    RealMatrix matrixP = MatrixUtils.createRealMatrix(p);
+                    RealMatrix matrixS = MatrixUtils.createRealMatrix(s);
+                    RealMatrix matrixPLine = matrixS.multiply(matrixP);
+
+                    Vertex aux = new Vertex();
+                    aux.x = matrixPLine.getEntry(0,0);
+                    aux.y = matrixPLine.getEntry(1,0);
+                    auxList.set(i, aux);
+                }
+                translation(auxList, 1, originalList.get(0).y * value);
+                translation(auxList, 3, originalList.get(0).x);
+                break;
+
+            default:
+                break;
+        }
+
+        this.verticesList = auxList;
+
+    }
+
     private void init() {
 
         // Setup an error callback. The default implementation
@@ -182,48 +294,41 @@ public class Main {
 
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
         glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
-            if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
-                glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
-            else {
-                if ( key == GLFW_KEY_UP && action == GLFW_RELEASE ) {
-                    for(int i = 0; i < verticesList.size(); i++) {
-                        Vertex aux = new Vertex();
-                        aux.x = verticesList.get(i).x;
-                        aux.y = verticesList.get(i).y - 1.0;
-                        verticesList.set(i, aux);
-                    }
-                }
-                else {
-                    if ( key == GLFW_KEY_DOWN && action == GLFW_RELEASE ) {
-                        for(int i = 0; i < verticesList.size(); i++) {
-                            Vertex aux = new Vertex();
-                            aux.x = verticesList.get(i).x;
-                            aux.y = verticesList.get(i).y + 1.0;
-                            verticesList.set(i, aux);
-                        }
-                    }
-                    else {
-                        if ( key == GLFW_KEY_LEFT && action == GLFW_RELEASE ) {
-                            for(int i = 0; i < verticesList.size(); i++) {
-                                Vertex aux = new Vertex();
-                                aux.x = verticesList.get(i).x - 1.0;
-                                aux.y = verticesList.get(i).y;
-                                verticesList.set(i, aux);
-                            }
-                        }
-                        else {
-                            if ( key == GLFW_KEY_RIGHT && action == GLFW_RELEASE ) {
-                                for(int i = 0; i < verticesList.size(); i++) {
-                                    Vertex aux = new Vertex();
-                                    aux.x = verticesList.get(i).x + 1.0;
-                                    aux.y = verticesList.get(i).y;
-                                    verticesList.set(i, aux);
-                                }
-                            }
-                        }
-                    }
+
+            if(action == GLFW_RELEASE) {
+                switch (key) {
+
+                    case GLFW_KEY_ESCAPE:
+                        glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
+                        break;
+
+                    case GLFW_KEY_UP:
+                        translation(this.verticesList, 0, 1.0);
+                        break;
+
+                    case GLFW_KEY_DOWN:
+                        translation(this.verticesList, 1, 1.0);
+                        break;
+
+                    case GLFW_KEY_LEFT:
+                        translation(this.verticesList, 2, 1.0);
+                        break;
+
+                    case GLFW_KEY_RIGHT:
+                        translation(this.verticesList, 3, 1.0);
+                        break;
+
+                    case GLFW_KEY_LEFT_BRACKET:
+                        scale(this.verticesList, 0, 1.1);
+                        break;
+
+                    case GLFW_KEY_RIGHT_BRACKET:
+                        scale(this.verticesList, 1, 1.1);
+                        break;
+
                 }
             }
+
         });
 
         // Setup a mouse callback. It will be called every time the left mouse button is pressed.
