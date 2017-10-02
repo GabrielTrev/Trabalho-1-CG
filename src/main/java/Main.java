@@ -1,6 +1,7 @@
 /*
     Algoritmo do Ponto Médio (Bresenham), feito por
         Felipe Khoji Myose (611026)
+        Gabriel Silva Trevisan (554812)
         Vinicius Ito Nagura (558478)
  */
 
@@ -269,6 +270,66 @@ public class Main {
 
     }
 
+    //procedimento para a rotacao da figura desenhada em relacao ao ponto (0,0)
+    public void rotate(ArrayList<Vertex> originalList, int direction, double angle) {
+
+        ArrayList<Vertex> auxList = new ArrayList<>();
+        auxList.addAll(originalList);
+
+        double x, y;
+
+        switch(direction) {
+            case 0: //anti-horario(R)
+                System.out.println("rotacao anti-horario");
+                for(int i = 0; i < auxList.size(); i++) {
+                    x = auxList.get(i).x;
+                    y = auxList.get(i).y;
+
+                    double[][] p = { {x}, {y} };
+                    double[][] r = { {cos(angle), -sin(angle)},
+                                     {sin(angle),  cos(angle)} };
+                    //p' = r*p
+                    RealMatrix matrixP = MatrixUtils.createRealMatrix(p);
+                    RealMatrix matrixR = MatrixUtils.createRealMatrix(r);
+                    RealMatrix matrixPLine = matrixR.multiply((matrixP));
+
+                    Vertex aux = new Vertex();
+                    aux.x = matrixPLine.getEntry(0, 0); //row,column
+                    aux.y = matrixPLine.getEntry(1, 0);
+                    auxList.set(i, aux); //possui as coordenadas transformadas
+                }
+                break;
+
+            case 1: //horario(T)
+                System.out.println("rotacao horario");
+                for(int i = 0; i < auxList.size(); i++) {
+                    x = auxList.get(i).x;
+                    y = auxList.get(i).y;
+
+                    double[][] p = { {x}, {y} };
+                    double[][] r = { {cos(angle), -sin(angle)},
+                            {sin(angle),  cos(angle)} };
+                    //p' = r*p
+                    RealMatrix matrixP = MatrixUtils.createRealMatrix(p);
+                    RealMatrix matrixR = MatrixUtils.createRealMatrix(r);
+                    RealMatrix matrixPLine = matrixR.multiply((matrixP));
+
+                    Vertex aux = new Vertex();
+                    aux.x = matrixPLine.getEntry(0, 0); //row,column
+                    aux.y = matrixPLine.getEntry(1, 0);
+                    auxList.set(i, aux); //possui as coordenadas transformadas
+                }
+                break;
+
+            default:
+                break;
+        }
+        //atualizacao da lista de Vertex
+        originalList.clear();
+        originalList.addAll(auxList);
+
+    }
+
     private void init() {
 
         // Setup an error callback. The default implementation
@@ -316,7 +377,8 @@ public class Main {
 
                     case GLFW_KEY_RIGHT:
                         translation(this.verticesList, 3, 1.0);
-                        break;
+                  Vertex aux = new Vertex();
+              break;
 
                     case GLFW_KEY_LEFT_BRACKET:
                         scale(this.verticesList, 0, 1.1);
@@ -325,7 +387,12 @@ public class Main {
                     case GLFW_KEY_RIGHT_BRACKET:
                         scale(this.verticesList, 1, 1.1);
                         break;
-
+                    case GLFW_KEY_R:
+                        rotate(this.verticesList, 0, 0.02);
+                        break;
+                    case GLFW_KEY_T:
+                        rotate(this.verticesList, 1, -0.02);
+                        break;
                 }
             }
 
