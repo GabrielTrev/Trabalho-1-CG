@@ -1,14 +1,7 @@
-// Estrutura contendo vertice do poligono a ser desenhado
-public class Vertex {
-    public double x;
-    public double y;
+import java.util.ArrayList;
 
-    public boolean equals(Vertex v) {
-        if (v == null) { return false; }
-        return v.x == this.x && v.y == this.y;
-    }
+public interface Vertex {
+    double[] toArray();
 
-    public double[] toArray() {
-        return new double[]{this.x, this.y};
-    }
+    static void setList(ArrayList<? extends Vertex> v1, ArrayList<? extends Vertex> v2) {}
 }

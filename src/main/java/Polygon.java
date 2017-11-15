@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,7 +16,7 @@ class ETNode{
     public ETNode() {}
 
     // Inicializacao do ETNode, dado um par de vertices
-    public ETNode(Vertex v1, Vertex v2) {
+    public ETNode(Vertex2D v1, Vertex2D v2) {
         this.maxY = Math.max(v1.y, v2.y);
         this.xMinY = (v1.y < v2.y) ? v1.x : v2.x;
         this.inverseSlope = (v2.x - v1.x) / (v2.y - v1.y);
@@ -47,24 +46,24 @@ class ETNodeComparator implements Comparator<ETNode> {
 }
 
 public class Polygon {
-    public static boolean closedPolygon(ArrayList<Vertex> vertices) {
+    public static boolean closedPolygon(ArrayList<Vertex2D> vertices) {
         if (vertices == null || vertices.size() <= 1) { return false; }
         return vertices.get(vertices.size() - 1).equals(vertices.get(0));
     }
 
-    public static void closePolygon(ArrayList<Vertex> vertices) {
+    public static void closePolygon(ArrayList<Vertex2D> vertices) {
         if (vertices == null || vertices.size() == 0) { return; }
         vertices.add(vertices.get(0));
     }
 
-    public static boolean withinBounds(ArrayList<Vertex> vertices, int width, int height) {
-        for (Vertex v : vertices) {
+    public static boolean withinBounds(ArrayList<Vertex2D> vertices, int width, int height) {
+        for (Vertex2D v : vertices) {
             if (v.x < 0 || v.y < 0 || v.x > width || v.y > height) { return false; }
         }
         return true;
     }
 
-    public static void setPolygon(ArrayList<Vertex> src, ArrayList<Vertex> dst) {
+    public static void setPolygon(ArrayList<Vertex2D> src, ArrayList<Vertex2D> dst) {
         if (src.size() != dst.size()) { return; }
 
         for (int i = 0; i < src.size(); i++){
@@ -74,7 +73,8 @@ public class Polygon {
     }
 
     // Implementacao do algoritmo de preenchimento de poligonos, dado o conjunto de vertices
-    public static void scanLine(ArrayList<Vertex> vertices, int width, int height) {
+    public static void scanLine(ArrayList<Vertex2D> vertices, int width, int height, float r, float g, float b) {
+
         if (!closedPolygon(vertices)) { return; }
 
         // Inicializacao da ET
@@ -132,7 +132,7 @@ public class Polygon {
             // Desenhos dos pontos, de acordo com os pares de valores de x do y_min
             for (int j = 0; j < AET.get(i).size() - 1; j += 2) {
                 for (int k = (int) (double) AET.get(i).get(j).getxMinY(); k < (int) (double) AET.get(i).get(j + 1).getxMinY(); k++) {
-                    glColor4f(1.0f, 0.0f, 0.0f, 0.0f);
+                    glColor4f(r, g, b, 0.0f);
                     glPointSize(1.0f);
                     glBegin(GL_POINTS);
                     glVertex2i(k, i);

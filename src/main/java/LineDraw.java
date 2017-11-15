@@ -5,7 +5,7 @@ import static org.lwjgl.opengl.GL11.glVertex2i;
 public class LineDraw {
     // bresenham method implemented using LineDraw's line algorithm, which is based on the solution proposed in
     // https://rosettacode.org/wiki/Bitmap/Bresenham%27s_line_algorithm#Java
-    public static void bresenham(Vertex v1, Vertex v2) {
+    public static void bresenham(Vertex2D v1, Vertex2D v2, float r, float g, float b) {
         // delta of exact value and rounded value of the dependant variable
         int x1 = (int)v1.x;
         int x2 = (int)v2.x;
@@ -22,7 +22,7 @@ public class LineDraw {
         int ix = x1 < x2 ? 1 : -1; // increment direction
         int iy = y1 < y2 ? 1 : -1;
 
-        glColor4f(1.0f, 0.0f, 0.0f, 0.0f);
+        glColor4f(r, g, b, 0.0f);
         glPointSize(3.0f);
         glBegin(GL_POINTS);
 
