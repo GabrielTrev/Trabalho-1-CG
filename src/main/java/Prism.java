@@ -36,7 +36,8 @@ public class Prism {
         double sum = 0;
         if (vertices == null || vertices.size() == 0) { return 0; }
         for (Vertex3D v : vertices) {
-            sum += v.computeDistance(center);
+            // sum += v.computeDistance(center);
+            sum+= Math.abs(v.z - center.z);
         }
         return sum / vertices.size();
     }
