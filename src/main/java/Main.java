@@ -48,8 +48,8 @@ public class Main {
 
     public static boolean draw3D = false;
 
-    public static Vertex3D center = new Vertex3D(width/2, height/2, -100);
-    ArrayList<ArrayList<Float>> colors = new ArrayList<>();
+    public static Vertex3D center = new Vertex3D(0, 0, -100);
+    static ArrayList<ArrayList<Float>> colors = new ArrayList<>();
 
     public void run() {
 
@@ -57,7 +57,7 @@ public class Main {
 
         init();
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < cube.size(); i++) {
             float r = (float) Math.random();
             float g = (float) Math.random();
             float b = (float) Math.random();
