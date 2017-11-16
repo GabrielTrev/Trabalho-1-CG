@@ -58,9 +58,9 @@ public class Main {
         init();
 
         for (int i = 0; i < 100; i++) {
-            float r = (float) Math.random() * 0.375f + 0.5f;
-            float g = (float) Math.random() * 0.125f;
-            float b = (float) Math.random() * 0.125f;
+            float r = (float) Math.random();
+            float g = (float) Math.random();
+            float b = (float) Math.random();
 
             colors.add(new ArrayList<Float>(Arrays.asList(r,g,b)));
         }
